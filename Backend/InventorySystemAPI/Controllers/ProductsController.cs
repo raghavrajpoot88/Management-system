@@ -17,7 +17,67 @@ namespace InventorySystemAPI.Controllers
         {
             _productRepository = productRepository;
         }
+        // GET: api/Products?pageSize=10&pageNumber=1&filterOn=ProductName&filterQuery=Product&sortBy=ProductName&isDescending=true
+        [HttpGet]
+        public async Task<IActionResult> GetProducts(
+            [FromQuery] int pageSize = 1000,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] string? filterOn = null,
+            [FromQuery] string? filterQuery = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] bool isDescending = false)
+        {
+            try
+            {
+                var (result, totalRecordCount, totalPages, pageNumberMessage, isPrevious, isNext) = await _productRepository.SearchSortAndPaginationAsync(
+                    filterOn,
+                    filterQuery,
+                    sortBy,
+                    isDescending,
+                    pageNumber,
+                    pageSize);
 
+                if (result == null || !result.Any())
+                {
+                    return NotFound("No data found.");
+                }
+
+                return Ok(new
+                {
+                    Result = result,
+                    TotalRecordCount = totalRecordCount,
+                    TotalPages = totalPages,
+                    PageNumberMessage = pageNumberMessage,
+                    IsPrevious = isPrevious,
+                    IsNext = isNext
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: api/Products/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProduct(Guid id)
+        {
+            try
+            {
+                var product = await _productRepository.GetByIdAsync(id);
+
+                if (product == null)
+                {
+                    return NotFound("Product not found.");
+                }
+
+                return Ok(product);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         // POST: api/Products
         [HttpPost]
