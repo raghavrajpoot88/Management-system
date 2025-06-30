@@ -39,5 +39,48 @@ namespace InventorySystemAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // GET: api/ProductCategories
+        [HttpGet]
+        public async Task<IActionResult> GetProductCategories()
+        {
+            try
+            {
+                var result = await _productCategoryRepository.GetAllAsync();
+
+                if (result == null || !result.Any())
+                {
+                    return NotFound("No data found.");
+                }
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: api/ProductCategories/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductCategory(Guid id)
+        {
+            try
+            {
+                var productCategory = await _productCategoryRepository.GetByIdAsync(id);
+
+                if (productCategory == null)
+                {
+                    return NotFound("No data found.");
+                }
+
+                return Ok(productCategory);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
