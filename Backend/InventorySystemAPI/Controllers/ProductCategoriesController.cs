@@ -81,6 +81,39 @@ namespace InventorySystemAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        // PUT: api/ProductCategories/5
+        [HttpPut("{id}")]
+        [ValidateModel]
+        public async Task<IActionResult> UpdateProductCategory(Guid id, [FromBody] ProductCategoryCreateDto productCategoryDto)
+        {
+
+            var existingProductCategory = await _productCategoryRepository.GetByIdAsync(id);
+
+            if (existingProductCategory == null)
+            {
+                return NotFound("No data found.");
+            }
+
+            existingProductCategory.ProductCategoryName = productCategoryDto.ProductCategoryName;
+
+            await _productCategoryRepository.UpdateAsync(existingProductCategory);
+            return Ok(existingProductCategory);
+        }
+
+        // DELETE: api/ProductCategories/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProductCategory(Guid id)
+        {
+            var productCategory = await _productCategoryRepository.GetByIdAsync(id);
+
+            if (productCategory == null)
+            {
+                return NotFound("No data found.");
+            }
+
+            await _productCategoryRepository.DeleteAsync(productCategory);
+            return Ok(new { message = "Product category deleted successfully.", productCategory });
+        }
 
     }
 }
