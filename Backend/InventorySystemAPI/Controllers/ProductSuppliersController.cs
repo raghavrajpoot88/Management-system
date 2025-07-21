@@ -19,6 +19,38 @@ namespace InventorySystemAPI.Controllers
             _productSupplierRepository = productSupplierRepository;
         }
 
+        // GET: api/ProductSuppliers
+        [HttpGet]
+        public async Task<IActionResult> GetProductSuppliers()
+        {
+            try
+            {
+                var productSuppliers = await _productSupplierRepository.GetAllAsync();
+
+                if (productSuppliers == null || !productSuppliers.Any())
+                {
+                    return NotFound("No data found.");
+                }
+
+                var resultDto = productSuppliers.Select(ps => new ProductSupplierReadDto
+                {
+                    FkProductId = ps.FkProductId,
+                    ProductName = ps.Product?.ProductName,
+                    FkSupplierId = ps.FkSupplierId,
+                    SupplierName = ps.Supplier?.SupplierName,
+                    Id = ps.Id,
+                    CreatedAt = ps.CreatedAt,
+                    UpdatedAt = ps.UpdatedAt
+                });
+
+                return Ok(resultDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         
 
         // POST: api/ProductSuppliers
