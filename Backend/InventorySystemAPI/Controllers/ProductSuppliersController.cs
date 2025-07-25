@@ -51,7 +51,38 @@ namespace InventorySystemAPI.Controllers
             }
         }
 
-        
+        // GET: api/ProductSuppliers/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductSupplier(Guid id)
+        {
+            try
+            {
+                var productSupplier = await _productSupplierRepository.GetByIdAsync(id);
+
+                if (productSupplier == null)
+                {
+                    return NotFound("No data found.");
+                }
+
+                var resultDto = new ProductSupplierReadDto
+                {
+                    FkProductId = productSupplier.FkProductId,
+                    ProductName = productSupplier.Product?.ProductName,
+                    FkSupplierId = productSupplier.FkSupplierId,
+                    SupplierName = productSupplier.Supplier?.SupplierName,
+                    Id = productSupplier.Id,
+                    CreatedAt = productSupplier.CreatedAt,
+                    UpdatedAt = productSupplier.UpdatedAt
+                };
+
+                return Ok(resultDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         // POST: api/ProductSuppliers
         [HttpPost]
