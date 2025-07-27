@@ -83,6 +83,39 @@ namespace InventorySystemAPI.Controllers
             }
         }
 
+        // PUT: api/ProductSuppliers/5
+        [HttpPut("{id}")]
+        [ValidateModel]
+        public async Task<IActionResult> PutProductSupplier(Guid id, [FromBody] ProductSupplierCreateDto productSupplierDto)
+        {
+            var existingProductSupplier = await _productSupplierRepository.GetByIdAsync(id);
+
+            if (existingProductSupplier == null)
+            {
+                return NotFound("No data found.");
+            }
+
+            existingProductSupplier.FkProductId = productSupplierDto.FkProductId;
+            existingProductSupplier.FkSupplierId = productSupplierDto.FkSupplierId;
+
+            await _productSupplierRepository.UpdateAsync(existingProductSupplier);
+            return Ok(existingProductSupplier);
+        }
+
+        // DELETE: api/ProductSuppliers/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProductSupplier(Guid id)
+        {
+            var productSupplier = await _productSupplierRepository.GetByIdAsync(id);
+
+            if (productSupplier == null)
+            {
+                return NotFound("No data found.");
+            }
+
+            await _productSupplierRepository.DeleteAsync(productSupplier);
+            return Ok(new { messahe = "Record deleted successfully.", productSupplier });
+        }
 
         // POST: api/ProductSuppliers
         [HttpPost]
